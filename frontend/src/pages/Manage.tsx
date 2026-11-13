@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { useWallet } from "../wallet";
 import { writeContract, STATUSES, errMsg } from "../contract";
+import { uploadToIpfs } from "../ipfs";
 
 export default function Manage() {
   const { signer, address } = useWallet();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [ipfs, setIpfs] = useState("");
+
+  async function onFile(file?: File) {
+    if (!file) return;
+    setBusy(true); setMsg(null);
+    try { setIpfs(await uploadToIpfs(file)); }
+    catch (e) { setMsg({ ok: false, text: errMsg(e) }); }
+    setBusy(false);
+  }
 
   async function run(label: string, fn: () => Promise<any>) {
     setBusy(true); setMsg(null);
@@ -26,10 +36,11 @@ export default function Manage() {
       <p className="mono">Connected: {address}</p>
 
       <h3>Register batch (manufacturer)</h3>
-      <form onSubmit={(e) => { const d = f(e); run("Register", () => c().registerProduct(d.get("name"), d.get("origin"), d.get("ipfs"))); }}>
+      <form onSubmit={(e) => { const d = f(e); run("Register", () => c().registerProduct(d.get("name"), d.get("origin"), ipfs)); }}>
         <input name="name" placeholder="Name" required />
         <input name="origin" placeholder="Origin" />
-        <input name="ipfs" placeholder="IPFS hash (optional)" />
+        <input value={ipfs} onChange={(e) => setIpfs(e.target.value)} placeholder="IPFS hash (optional)" />
+        <input type="file" onChange={(e) => onFile(e.target.files?.[0])} />
         <button disabled={busy}>Register</button>
       </form>
 
