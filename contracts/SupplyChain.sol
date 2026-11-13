@@ -16,6 +16,7 @@ contract SupplyChain is AccessControl {
         uint256 id;
         string name;
         string origin;
+        string details; // JSON: category, quantity, description
         string ipfsHash;
         address manufacturer;
         address currentOwner;
@@ -69,7 +70,12 @@ contract SupplyChain is AccessControl {
     }
 
     /// @notice Register a new product batch. Caller becomes first owner.
-    function registerProduct(string calldata name, string calldata origin, string calldata ipfsHash)
+    function registerProduct(
+        string calldata name,
+        string calldata origin,
+        string calldata details,
+        string calldata ipfsHash
+    )
         external
         onlyRole(MANUFACTURER_ROLE)
         returns (uint256 id)
@@ -77,7 +83,17 @@ contract SupplyChain is AccessControl {
         if (bytes(name).length == 0) revert EmptyName();
         id = ++productCount;
         uint64 ts = uint64(block.timestamp);
-        _products[id] = Product(id, name, origin, ipfsHash, msg.sender, msg.sender, Status.Manufactured, ts, true);
+        Product storage p = _products[id];
+        p.id = id;
+        p.name = name;
+        p.origin = origin;
+        p.details = details;
+        p.ipfsHash = ipfsHash;
+        p.manufacturer = msg.sender;
+        p.currentOwner = msg.sender;
+        p.status = Status.Manufactured;
+        p.createdAt = ts;
+        p.exists = true;
         _history[id].push(HistoryEntry(address(0), msg.sender, Status.Manufactured, ts, "Registered"));
         emit ProductRegistered(id, msg.sender, name, origin, ipfsHash, ts);
     }

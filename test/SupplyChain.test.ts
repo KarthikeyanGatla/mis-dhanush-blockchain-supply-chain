@@ -9,14 +9,14 @@ describe("SupplyChain", () => {
     await sc.grantRole(await sc.MANUFACTURER_ROLE(), manu.address);
     await sc.grantRole(await sc.DISTRIBUTOR_ROLE(), dist.address);
     await sc.grantRole(await sc.RETAILER_ROLE(), ret.address);
-    await sc.connect(manu).registerProduct("Coffee", "Kenya", "Qm123");
+    await sc.connect(manu).registerProduct("Coffee", "Kenya", "{}", "Qm123");
     return { sc, admin, manu, dist, ret, cust, rando };
   }
 
   describe("registerProduct", () => {
     it("registers and emits event", async () => {
       const { sc, manu } = await loadFixture(deploy);
-      await expect(sc.connect(manu).registerProduct("Tea", "India", "Qm9"))
+      await expect(sc.connect(manu).registerProduct("Tea", "India", "{}", "Qm9"))
         .to.emit(sc, "ProductRegistered");
       expect(await sc.productCount()).to.equal(2);
       const p = await sc.getProduct(2);
@@ -24,11 +24,11 @@ describe("SupplyChain", () => {
     });
     it("reverts for non-manufacturer", async () => {
       const { sc, rando } = await loadFixture(deploy);
-      await expect(sc.connect(rando).registerProduct("X", "Y", "Z")).to.be.reverted;
+      await expect(sc.connect(rando).registerProduct("X", "Y", "{}", "Z")).to.be.reverted;
     });
     it("reverts on empty name", async () => {
       const { sc, manu } = await loadFixture(deploy);
-      await expect(sc.connect(manu).registerProduct("", "Y", "Z")).to.be.revertedWithCustomError(sc, "EmptyName");
+      await expect(sc.connect(manu).registerProduct("", "Y", "{}", "Z")).to.be.revertedWithCustomError(sc, "EmptyName");
     });
   });
 

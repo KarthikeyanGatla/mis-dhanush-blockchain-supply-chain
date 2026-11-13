@@ -10,7 +10,7 @@ async function main() {
   await (await sc.grantRole(await sc.DISTRIBUTOR_ROLE(), dist.address)).wait();
   await (await sc.grantRole(await sc.RETAILER_ROLE(), ret.address)).wait();
 
-  await (await sc.connect(manu).registerProduct("Organic Coffee", "Kenya", "QmDemoHash")).wait();
+  await (await sc.connect(manu).registerProduct("Organic Coffee Beans", "Nyeri, Kenya", JSON.stringify({ category: "Food & Beverage", quantity: "500 kg", description: "Single-origin arabica, Fairtrade certified" }), "")).wait();
   await (await sc.connect(manu).transferCustody(1, dist.address)).wait();
   await (await sc.connect(dist).updateStatus(1, 2, "In transit to retailer")).wait();
   await (await sc.connect(dist).transferCustody(1, ret.address)).wait();

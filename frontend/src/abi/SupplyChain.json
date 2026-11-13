@@ -450,6 +450,11 @@
           },
           {
             "internalType": "string",
+            "name": "details",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
             "name": "ipfsHash",
             "type": "string"
           },
@@ -608,6 +613,11 @@
       {
         "internalType": "string",
         "name": "origin",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "details",
         "type": "string"
       },
       {
